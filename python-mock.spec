@@ -1,13 +1,13 @@
-%define 	module	mock
+%define		module	mock
 Summary:	A Python Mocking and Patching Library for Testing
 Summary(pl.UTF-8):	Biblioteka Pythona do testów przy użyciu techniki "mock" i łatania
 Name:		python-%{module}
-Version:	0.8.0
+Version:	1.0.1
 Release:	1
 License:	BSD-like
 Group:		Development/Languages/Python
 Source0:	http://pypi.python.org/packages/source/m/mock/%{module}-%{version}.tar.gz
-# Source0-md5:	b1ac87a1ceab295aef11dcfc104a7a4a
+# Source0-md5:	c3971991738caa55ec7c356bbc154ee2
 URL:		http://python-mock.sourceforge.net/
 BuildRequires:	python-devel >= 2.4
 BuildRequires:	python-distribute
