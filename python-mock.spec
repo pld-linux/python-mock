@@ -15,16 +15,16 @@ Group:		Development/Languages/Python
 Source0:	http://pypi.python.org/packages/source/m/mock/%{module}-%{version}.tar.gz
 # Source0-md5:	c3971991738caa55ec7c356bbc154ee2
 URL:		http://python-mock.sourceforge.net/
-%if %{with python2}
-BuildRequires:	python-devel >= 2.4
-BuildRequires:	python-distribute
-%endif
-%if %{with python3}
-BuildRequires:	python3-devel
-BuildRequires:	python3-distribute
-%endif
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.228
+%if %{with python2}
+BuildRequires:	python-modules
+BuildRequires:	python-setuptools
+%endif
+%if %{with python3}
+BuildRequires:	python3-modules
+BuildRequires:	python3-setuptools
+%endif
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
