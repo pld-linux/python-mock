@@ -1,5 +1,6 @@
-
+#
 # Conditional build:
+%bcond_without	doc		# don't build doc
 %bcond_without	python2 # CPython 2.x module
 %bcond_without	python3 # CPython 3.x module
 
@@ -8,7 +9,7 @@ Summary:	A Python Mocking and Patching Library for Testing
 Summary(pl.UTF-8):	Biblioteka Pythona do testów przy użyciu techniki "mock" i łatania
 Name:		python-%{module}
 Version:	1.0.1
-Release:	3
+Release:	4
 License:	BSD-like
 Group:		Development/Languages/Python
 Source0:	http://pypi.python.org/packages/source/m/mock/%{module}-%{version}.tar.gz
@@ -100,6 +101,16 @@ najnowszymi wersjami Jythona i pypy.
 Moduł mock udostępnia także funkcje/obiekty narzędziowe pomagające
 przy testowaniu, w szczególności łataniu.
 
+%package apidocs
+Summary:	%{module} API documentation
+Summary(pl.UTF-8):	Dokumentacja API %{module}
+Group:		Documentation
+
+%description apidocs
+API documentation for %{module}.
+
+%description apidocs -l pl.UTF-8
+Dokumentacja API %{module}.
 
 %prep
 %setup -q -n %{module}-%{version}
@@ -140,18 +151,22 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with python2}
 %files
 %defattr(644,root,root,755)
-%doc LICENSE.txt README.txt html
+%doc LICENSE.txt README.txt
 %{py_sitescriptdir}/mock.py[co]
-%if "%{py_ver}" > "2.4"
 %{py_sitescriptdir}/%{module}-%{version}-py*.egg-info
-%endif
 %endif
 
 %if %{with python3}
 %files -n python3-%{module}
 %defattr(644,root,root,755)
-%doc LICENSE.txt README.txt html
+%doc LICENSE.txt README.txt
 %{py3_sitescriptdir}/mock.py
 %{py3_sitescriptdir}/__pycache__/mock.*
 %{py3_sitescriptdir}/%{module}-*.egg-info
+%endif
+
+%if %{with doc}
+%files apidocs
+%defattr(644,root,root,755)
+%doc html/*
 %endif
