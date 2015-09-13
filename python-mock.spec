@@ -9,7 +9,7 @@ Summary:	A Python Mocking and Patching Library for Testing
 Summary(pl.UTF-8):	Biblioteka Pythona do testów przy użyciu techniki "mock" i łatania
 Name:		python-%{module}
 Version:	1.0.1
-Release:	4
+Release:	5
 License:	BSD-like
 Group:		Development/Languages/Python
 Source0:	http://pypi.python.org/packages/source/m/mock/%{module}-%{version}.tar.gz
