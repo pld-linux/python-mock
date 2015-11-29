@@ -16,7 +16,7 @@ Source0:	http://pypi.python.org/packages/source/m/mock/%{module}-%{version}.tar.
 # Source0-md5:	c3971991738caa55ec7c356bbc154ee2
 URL:		http://python-mock.sourceforge.net/
 BuildRequires:	rpm-pythonprov
-BuildRequires:	rpmbuild(macros) >= 1.228
+BuildRequires:	rpmbuild(macros) >= 1.710
 %if %{with python2}
 BuildRequires:	python-modules
 BuildRequires:	python-setuptools
