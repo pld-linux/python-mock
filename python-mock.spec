@@ -1,30 +1,39 @@
 #
 # Conditional build:
-%bcond_without	doc		# don't build doc
+%bcond_without	doc	# Sphinx documentation
 %bcond_without	python2 # CPython 2.x module
 %bcond_without	python3 # CPython 3.x module
+%bcond_with	tests	# test target
 
 %define		module	mock
 Summary:	A Python Mocking and Patching Library for Testing
 Summary(pl.UTF-8):	Biblioteka Pythona do testów przy użyciu techniki "mock" i łatania
 Name:		python-%{module}
-Version:	1.0.1
-Release:	6
+Version:	1.3.0
+Release:	1
 License:	BSD-like
 Group:		Development/Languages/Python
-Source0:	http://pypi.python.org/packages/source/m/mock/%{module}-%{version}.tar.gz
-# Source0-md5:	c3971991738caa55ec7c356bbc154ee2
+#Source0Download: https://pypi.python.org/simple/mock/
+Source0:	https://pypi.python.org/packages/source/m/mock/%{module}-%{version}.tar.gz
+# Source0-md5:	73ee8a4afb3ff4da1b4afa287f39fdeb
 URL:		http://python-mock.sourceforge.net/
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.710
 %if %{with python2}
-BuildRequires:	python-modules
-BuildRequires:	python-setuptools
+BuildRequires:	python-modules >= 1:2.6
+BuildRequires:	python-pbr >= 1.3
+BuildRequires:	python-setuptools >= 17.1
+BuildRequires:	python-six >= 1.7
+%{?with_tests:BuildRequires:	python-unittest2 >= 1.1.0}
 %endif
 %if %{with python3}
-BuildRequires:	python3-modules
-BuildRequires:	python3-setuptools
+BuildRequires:	python3-modules >= 1:3.2
+BuildRequires:	python3-pbr >= 1.3
+BuildRequires:	python3-setuptools >= 17.1
+BuildRequires:	python3-six >= 1.7
+%{?with_tests:BuildRequires:	python3-unittest2 >= 1.1.0}
 %endif
+%{?with_doc:BuildRequires:	sphinx-pdg}
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -39,9 +48,6 @@ you can make assertions about which methods/attributes were used and
 arguments they were called with. You can also specify return values
 and set needed attributes in the normal way.
 
-mock is tested on Python versions 2.4-2.7 and Python 3. mock is also
-tested with the latest versions of Jython and pypy.
-
 The mock module also provides utility functions/objects to assist with
 testing, particularly monkey patching.
 
@@ -55,9 +61,6 @@ tworzyć systemu zaślepek do testów. W czasie wykonywania akcji można
 kontrolować, czy odpowiednie metody/atrybuty zostały użyte i z jakimi
 argumentami. Można określić zwracane wartości i w zwykły sposób
 ustawiać potrzebne atrybuty.
-
-mock jest testowany z Pythonem w wersjach 2.4-2.7 oraz 3, a także z
-najnowszymi wersjami Jythona i pypy.
 
 Moduł mock udostępnia także funkcje/obiekty narzędziowe pomagające
 przy testowaniu, w szczególności łataniu.
@@ -78,9 +81,6 @@ you can make assertions about which methods/attributes were used and
 arguments they were called with. You can also specify return values
 and set needed attributes in the normal way.
 
-mock is tested on Python versions 2.4-2.7 and Python 3. mock is also
-tested with the latest versions of Jython and pypy.
-
 The mock module also provides utility functions/objects to assist with
 testing, particularly monkey patching.
 
@@ -95,33 +95,38 @@ kontrolować, czy odpowiednie metody/atrybuty zostały użyte i z jakimi
 argumentami. Można określić zwracane wartości i w zwykły sposób
 ustawiać potrzebne atrybuty.
 
-mock jest testowany z Pythonem w wersjach 2.4-2.7 oraz 3, a także z
-najnowszymi wersjami Jythona i pypy.
-
 Moduł mock udostępnia także funkcje/obiekty narzędziowe pomagające
 przy testowaniu, w szczególności łataniu.
 
 %package apidocs
-Summary:	%{module} API documentation
-Summary(pl.UTF-8):	Dokumentacja API %{module}
+Summary:	API documentation for mock module
+Summary(pl.UTF-8):	Dokumentacja API modułu mock
 Group:		Documentation
 
 %description apidocs
-API documentation for %{module}.
+API documentation for mock module.
 
 %description apidocs -l pl.UTF-8
-Dokumentacja API %{module}.
+Dokumentacja API modułu mock.
 
 %prep
 %setup -q -n %{module}-%{version}
 
+# avoid rewriting by pbr
+chmod a-w AUTHORS ChangeLog
+
 %build
 %if %{with python2}
-%py_build
+%py_build %{?with_tests:test}
 %endif
 
 %if %{with python3}
-%py3_build
+%py3_build %{?with_tests:test}
+%endif
+
+%if %{with doc}
+sphinx-build -b html docs html
+%{__rm} -r html/{_sources,.doctrees,.buildinfo}
 %endif
 
 %install
@@ -135,6 +140,11 @@ rm -rf $RPM_BUILD_ROOT
 
 %if %{with python3}
 %py3_install
+
+# pythonegg dependency generator resolves conditionals for requires() based on
+# python version that runs the generator, not the version egg is targeted;
+# avoid generation of python3egg(funcsigs) dependency for python >= 3.3
+%{__sed} -i -e '/^\[:(python_version<"3.3")]/,/^$/d' $RPM_BUILD_ROOT%{py3_sitescriptdir}/mock-%{version}-py*.egg-info/requires.txt
 %endif
 
 %clean
@@ -143,18 +153,17 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with python2}
 %files
 %defattr(644,root,root,755)
-%doc LICENSE.txt README.txt
-%{py_sitescriptdir}/mock.py[co]
+%doc AUTHORS ChangeLog LICENSE.txt NEWS README.rst
+%{py_sitescriptdir}/mock
 %{py_sitescriptdir}/%{module}-%{version}-py*.egg-info
 %endif
 
 %if %{with python3}
 %files -n python3-%{module}
 %defattr(644,root,root,755)
-%doc LICENSE.txt README.txt
-%{py3_sitescriptdir}/mock.py
-%{py3_sitescriptdir}/__pycache__/mock.*
-%{py3_sitescriptdir}/%{module}-*.egg-info
+%doc AUTHORS ChangeLog LICENSE.txt NEWS README.rst
+%{py3_sitescriptdir}/mock
+%{py3_sitescriptdir}/%{module}-%{version}-py*.egg-info
 %endif
 
 %if %{with doc}
