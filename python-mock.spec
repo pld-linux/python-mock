@@ -10,7 +10,7 @@ Summary:	A Python Mocking and Patching Library for Testing
 Summary(pl.UTF-8):	Biblioteka Pythona do testów przy użyciu techniki "mock" i łatania
 Name:		python-%{module}
 Version:	2.0.0
-Release:	1
+Release:	2
 License:	BSD-like
 Group:		Development/Languages/Python
 #Source0Download: https://pypi.python.org/simple/mock/
@@ -125,7 +125,7 @@ chmod a-w AUTHORS ChangeLog
 %endif
 
 %if %{with doc}
-sphinx-build -b html docs html
+PYTHONPATH=. sphinx-build -b html docs html
 %{__rm} -r html/{_sources,.doctrees,.buildinfo}
 %endif
 
