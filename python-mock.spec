@@ -9,13 +9,13 @@
 Summary:	A Python Mocking and Patching Library for Testing
 Summary(pl.UTF-8):	Biblioteka Pythona do testów przy użyciu techniki "mock" i łatania
 Name:		python-%{module}
-Version:	1.3.0
-Release:	3
+Version:	2.0.0
+Release:	1
 License:	BSD-like
 Group:		Development/Languages/Python
 #Source0Download: https://pypi.python.org/simple/mock/
 Source0:	https://pypi.python.org/packages/source/m/mock/%{module}-%{version}.tar.gz
-# Source0-md5:	73ee8a4afb3ff4da1b4afa287f39fdeb
+# Source0-md5:	0febfafd14330c9dcaa40de2d82d40ad
 URL:		http://python-mock.sourceforge.net/
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.710
