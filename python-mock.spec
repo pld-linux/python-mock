@@ -21,19 +21,25 @@ BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.710
 %if %{with python2}
 BuildRequires:	python-modules >= 1:2.6
-BuildRequires:	python-pbr >= 1.3
 BuildRequires:	python-setuptools >= 17.1
+%if %{with tests}
+BuildRequires:	python-pbr >= 1.3
 BuildRequires:	python-six >= 1.7
-%{?with_tests:BuildRequires:	python-unittest2 >= 1.1.0}
+BuildRequires:	python-unittest2 >= 1.1.0
+%endif
 %endif
 %if %{with python3}
 BuildRequires:	python3-modules >= 1:3.2
-BuildRequires:	python3-pbr >= 1.3
 BuildRequires:	python3-setuptools >= 17.1
+%if %{with doc} || %{with tests}
+BuildRequires:	python3-pbr >= 1.3
 BuildRequires:	python3-six >= 1.7
+%endif
 %{?with_tests:BuildRequires:	python3-unittest2 >= 1.1.0}
 %endif
-%{?with_doc:BuildRequires:	sphinx-pdg}
+%if %{with doc}
+BuildRequires:	sphinx-pdg-3
+%endif
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -125,7 +131,7 @@ chmod a-w AUTHORS ChangeLog
 %endif
 
 %if %{with doc}
-PYTHONPATH=. sphinx-build -b html docs html
+PYTHONPATH=. sphinx-build-3 -b html docs html
 %{__rm} -r html/{_sources,.doctrees,.buildinfo}
 %endif
 
