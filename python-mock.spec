@@ -13,27 +13,31 @@ Version:	2.0.0
 Release:	4
 License:	BSD-like
 Group:		Development/Languages/Python
-#Source0Download: https://pypi.python.org/simple/mock/
-Source0:	https://pypi.python.org/packages/source/m/mock/%{module}-%{version}.tar.gz
+#Source0Download: https://pypi.org/simple/mock/
+Source0:	https://files.pythonhosted.org/packages/source/m/mock/%{module}-%{version}.tar.gz
 # Source0-md5:	0febfafd14330c9dcaa40de2d82d40ad
 URL:		http://python-mock.sourceforge.net/
 BuildRequires:	rpm-pythonprov
-BuildRequires:	rpmbuild(macros) >= 1.710
+BuildRequires:	rpmbuild(macros) >= 1.714
 %if %{with python2}
 BuildRequires:	python-modules >= 1:2.6
+BuildRequires:	python-pbr >= 1.3
 BuildRequires:	python-setuptools >= 17.1
 %if %{with tests}
-BuildRequires:	python-pbr >= 1.3
-BuildRequires:	python-six >= 1.7
+BuildRequires:	python-funcsigs >= 1
+BuildRequires:	python-six >= 1.9
 BuildRequires:	python-unittest2 >= 1.1.0
 %endif
 %endif
 %if %{with python3}
 BuildRequires:	python3-modules >= 1:3.2
+BuildRequires:	python3-pbr >= 1.3
 BuildRequires:	python3-setuptools >= 17.1
 %if %{with doc} || %{with tests}
-BuildRequires:	python3-pbr >= 1.3
-BuildRequires:	python3-six >= 1.7
+%if "%{py3_ver}" < "3.3"
+BuildRequires:	python3-funcsigs >= 1
+%endif
+BuildRequires:	python3-six >= 1.9
 %endif
 %{?with_tests:BuildRequires:	python3-unittest2 >= 1.1.0}
 %endif
