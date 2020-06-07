@@ -3,45 +3,45 @@
 %bcond_without	doc	# Sphinx documentation
 %bcond_without	python2 # CPython 2.x module
 %bcond_without	python3 # CPython 3.x module
-%bcond_with	tests	# test target
+%bcond_without	tests	# unit tests
 
 %define		module	mock
-Summary:	A Python Mocking and Patching Library for Testing
-Summary(pl.UTF-8):	Biblioteka Pythona do testów przy użyciu techniki "mock" i łatania
+Summary:	Rolling backport of unittest.mock for all Pythons
+Summary(pl.UTF-8):	Podążający backport modułu unittest.mock dla wszystkich wersji Pythona
 Name:		python-%{module}
-Version:	2.0.0
-Release:	4
-License:	BSD-like
+# keep 3.x here for python2 support
+Version:	3.0.5
+Release:	1
+License:	BSD
 Group:		Development/Languages/Python
-#Source0Download: https://pypi.org/simple/mock/
-Source0:	https://files.pythonhosted.org/packages/source/m/mock/%{module}-%{version}.tar.gz
-# Source0-md5:	0febfafd14330c9dcaa40de2d82d40ad
+##Source0Download: https://pypi.org/simple/mock/
+#Source0:	https://files.pythonhosted.org/packages/source/m/mock/%{module}-%{version}.tar.gz
+# pypi dist misses docs and tests, use github archive
+#Source0Download: https://github.com/testing-cabal/mock/releases
+Source0:	https://github.com/testing-cabal/mock/archive/%{version}/%{module}-%{version}.tar.gz
+# Source0-md5:	4026d6ad2a518ae05b993f5ea28ede75
 URL:		http://python-mock.sourceforge.net/
-BuildRequires:	rpm-pythonprov
-BuildRequires:	rpmbuild(macros) >= 1.714
 %if %{with python2}
-BuildRequires:	python-modules >= 1:2.6
-BuildRequires:	python-pbr >= 1.3
+BuildRequires:	python-modules >= 1:2.7
 BuildRequires:	python-setuptools >= 17.1
 %if %{with tests}
 BuildRequires:	python-funcsigs >= 1
+BuildRequires:	python-pytest
 BuildRequires:	python-six >= 1.9
-BuildRequires:	python-unittest2 >= 1.1.0
 %endif
 %endif
 %if %{with python3}
-BuildRequires:	python3-modules >= 1:3.2
-BuildRequires:	python3-pbr >= 1.3
+BuildRequires:	python3-modules >= 1:3.4
 BuildRequires:	python3-setuptools >= 17.1
-%if %{with doc} || %{with tests}
-%if "%{py3_ver}" < "3.3"
-BuildRequires:	python3-funcsigs >= 1
-%endif
+%if %{with tests}
+BuildRequires:	python3-pytest
 BuildRequires:	python3-six >= 1.9
 %endif
-%{?with_tests:BuildRequires:	python3-unittest2 >= 1.1.0}
 %endif
+BuildRequires:	rpm-pythonprov
+BuildRequires:	rpmbuild(macros) >= 1.714
 %if %{with doc}
+BuildRequires:	python3-six >= 1.9
 BuildRequires:	sphinx-pdg-3
 %endif
 BuildArch:	noarch
@@ -76,8 +76,8 @@ Moduł mock udostępnia także funkcje/obiekty narzędziowe pomagające
 przy testowaniu, w szczególności łataniu.
 
 %package -n python3-%{module}
-Summary:	A Python Mocking and Patching Library for Testing
-Summary(pl.UTF-8):	Biblioteka Pythona do testów przy użyciu techniki "mock" i łatania
+Summary:	Rolling backport of unittest.mock for all Pythons
+Summary(pl.UTF-8):	Podążający backport modułu unittest.mock dla wszystkich wersji Pythona
 Group:		Development/Languages/Python
 
 %description -n python3-%{module}
@@ -122,16 +122,25 @@ Dokumentacja API modułu mock.
 %prep
 %setup -q -n %{module}-%{version}
 
-# avoid rewriting by pbr
-chmod a-w AUTHORS ChangeLog
-
 %build
 %if %{with python2}
-%py_build %{?with_tests:test}
+%py_build
+
+%if %{with tests}
+# disable plugins (e.g. pytest-mock) to avoid changing assert output
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 \
+%{__python} -m pytest mock/tests
+%endif
 %endif
 
 %if %{with python3}
-%py3_build %{?with_tests:test}
+%py3_build
+
+%if %{with tests}
+# disable plugins (e.g. pytest-mock) to avoid changing assert output
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 \
+%{__python3} -m pytest mock/tests
+%endif
 %endif
 
 %if %{with doc}
@@ -150,11 +159,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %if %{with python3}
 %py3_install
-
-# pythonegg dependency generator resolves conditionals for requires() based on
-# python version that runs the generator, not the version egg is targeted;
-# avoid generation of python3egg(funcsigs) dependency for python >= 3.3
-%{__sed} -i -e '/^\[:(python_version<"3.3")]/,/^$/d' $RPM_BUILD_ROOT%{py3_sitescriptdir}/mock-%{version}-py*.egg-info/requires.txt
 %endif
 
 %clean
@@ -163,7 +167,7 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with python2}
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS ChangeLog LICENSE.txt NEWS README.rst
+%doc CHANGELOG.rst LICENSE.txt README.rst
 %{py_sitescriptdir}/mock
 %{py_sitescriptdir}/%{module}-%{version}-py*.egg-info
 %endif
@@ -171,7 +175,7 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with python3}
 %files -n python3-%{module}
 %defattr(644,root,root,755)
-%doc AUTHORS ChangeLog LICENSE.txt NEWS README.rst
+%doc CHANGELOG.rst LICENSE.txt README.rst
 %{py3_sitescriptdir}/mock
 %{py3_sitescriptdir}/%{module}-%{version}-py*.egg-info
 %endif
@@ -179,5 +183,5 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with doc}
 %files apidocs
 %defattr(644,root,root,755)
-%doc html/*
+%doc html/{_static,*.html,*.js}
 %endif
