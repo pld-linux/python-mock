@@ -12,7 +12,7 @@ Summary(pl.UTF-8):	Podążający backport modułu unittest.mock dla wszystkich w
 Name:		python-%{module}
 # keep 3.x here for python2 support
 Version:	3.0.5
-Release:	1
+Release:	2
 License:	BSD
 Group:		Development/Languages/Python
 ##Source0Download: https://pypi.org/simple/mock/
