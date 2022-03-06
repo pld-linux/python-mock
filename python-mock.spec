@@ -42,8 +42,8 @@ BuildRequires:	python3-six >= 1.9
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.714
 %if %{with doc}
-BuildRequires:	python3-six >= 1.9
-BuildRequires:	sphinx-pdg-3
+BuildRequires:	python-six >= 1.9
+BuildRequires:	sphinx-pdg-2
 %endif
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -145,8 +145,8 @@ PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 \
 %endif
 
 %if %{with doc}
-PYTHONPATH=. sphinx-build-3 -b html docs html
-%{__rm} -r html/{_sources,.doctrees,.buildinfo}
+PYTHONPATH=. \
+sphinx-build-2 -b html docs html
 %endif
 
 %install
